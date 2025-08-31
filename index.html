@@ -1,0 +1,1112 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Pediatric Anesthesia Calculator</title>
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+      rel="stylesheet"
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;900&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      /* CSS Variables from components.css for consistent styling */
+      :root {
+        --primary-gradient: linear-gradient(135deg, #2b5876, #4e4376);
+        --primary-dark: #2b5876;
+        --primary-light: #4e4376;
+        --bg-gradient: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+        --bg-light: #f8f9fa;
+        --white: #ffffff;
+        --text-light: #ffffff;
+        --text-dark: #2c3e50;
+        --text-muted: #6c757d;
+        --glass-bg: hsla(0, 0%, 100%, 0.95);
+        --glass-border: rgba(0, 0, 0, 0.08);
+        --shadow-light: rgba(0, 0, 0, 0.06);
+        --shadow-medium: rgba(0, 0, 0, 0.15);
+        --border-radius: 16px;
+        --border-radius-lg: 20px;
+        --transition: all 0.3s ease;
+      }
+
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: "Poppins", sans-serif;
+        background: var(--bg-gradient);
+        min-height: 100vh;
+        color: var(--text-dark);
+      }
+
+      .hero-section {
+        background: var(--primary-gradient);
+        padding: 2rem 0;
+        text-align: center;
+        color: var(--text-light);
+        box-shadow: 0 4px 20px var(--shadow-light);
+      }
+
+      .hero-title {
+        font-size: 2.5rem;
+        font-weight: 700;
+        margin-bottom: 0.5rem;
+        animation: fadeInUp 0.8s ease-out;
+      }
+
+      .hero-subtitle {
+        font-size: 1.1rem;
+        opacity: 0.9;
+        animation: fadeInUp 0.8s ease-out 0.2s both;
+      }
+
+      .container {
+        max-width: 1400px;
+        margin: 0 auto;
+        padding: 2rem;
+      }
+
+      .input-section {
+        background: var(--glass-bg);
+        backdrop-filter: blur(20px);
+        border: 1px solid var(--glass-border);
+        border-radius: var(--border-radius-lg);
+        padding: 2rem;
+        margin-bottom: 2rem;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        animation: fadeInUp 0.8s ease-out 0.4s both;
+      }
+
+      .input-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 1.5rem;
+        margin-bottom: 1.5rem;
+      }
+
+      .input-group {
+        position: relative;
+      }
+
+      .input-field {
+        width: 100%;
+        padding: 1rem 1rem 1rem 3rem;
+        border: 1px solid rgba(0, 0, 0, 0.1);
+        border-radius: 10px;
+        font-size: 1rem;
+        transition: var(--transition);
+        background-color: var(--bg-light);
+      }
+
+      .input-field:focus {
+        outline: none;
+        border-color: var(--primary-dark);
+        background: var(--white);
+        box-shadow: 0 0 0 3px rgba(43, 88, 118, 0.1);
+      }
+
+      .input-icon {
+        position: absolute;
+        left: 1rem;
+        top: 50%;
+        transform: translateY(-50%);
+        color: var(--primary-dark);
+        font-size: 1.1rem;
+      }
+
+      .input-label {
+        position: absolute;
+        left: 3rem;
+        top: 1rem;
+        color: var(--text-muted);
+        font-size: 0.9rem;
+        transition: var(--transition);
+        pointer-events: none;
+      }
+
+      .input-field:focus + .input-label,
+      .input-field:not(:placeholder-shown) + .input-label {
+        top: -0.5rem;
+        left: 1rem;
+        font-size: 0.75rem;
+        color: var(--primary-dark);
+        background: var(--white);
+        padding: 0 0.25rem;
+      }
+
+      .button-group {
+        display: flex;
+        gap: 1rem;
+        justify-content: center;
+        align-items: center;
+        flex-wrap: wrap;
+      }
+
+      .calculate-btn,
+      .settings-btn {
+        background: var(--primary-gradient);
+        color: var(--text-light);
+        border: none;
+        padding: 0.8rem 1.8rem;
+        border-radius: 25px;
+        font-size: 1rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: var(--transition);
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        min-width: 200px;
+        justify-content: center;
+        box-shadow: 0 3px 12px rgba(43, 88, 118, 0.3);
+      }
+
+      .calculate-btn:hover,
+      .settings-btn:hover {
+        transform: translateY(-3px) scale(1.02);
+        box-shadow: 0 8px 25px rgba(43, 88, 118, 0.4);
+      }
+
+      .results-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+        gap: 1.5rem;
+        margin-top: 2rem;
+      }
+
+      .result-card {
+        background: var(--glass-bg);
+        backdrop-filter: blur(20px);
+        border-radius: var(--border-radius);
+        padding: 1.5rem;
+        box-shadow: 0 4px 20px var(--shadow-light);
+        transition: var(--transition);
+        animation: fadeInUp 0.6s ease-out both;
+        border: 1px solid var(--glass-border);
+        border-left: 4px solid transparent;
+      }
+
+      .result-card:hover {
+        transform: translateY(-8px) scale(1.02);
+        box-shadow: 0 15px 40px var(--shadow-medium);
+        background: var(--white);
+      }
+
+      /* New Accent Colors */
+      .result-card.airway {
+        border-left-color: #17a2b8;
+      }
+      .result-card.induction {
+        border-left-color: #2b5876;
+      }
+      .result-card.muscle {
+        border-left-color: #4e4376;
+      }
+      .result-card.analgesic {
+        border-left-color: #28a745;
+      }
+      .result-card.emergency {
+        border-left-color: #ffc107;
+      }
+      .result-card.sedation {
+        border-left-color: #6f42c1;
+      }
+
+      .card-header {
+        display: flex;
+        align-items: center;
+        margin-bottom: 1rem;
+      }
+
+      .card-icon {
+        width: 50px;
+        height: 50px;
+        border-radius: var(--border-radius);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-right: 1rem;
+        font-size: 1.5rem;
+        color: var(--text-light);
+        box-shadow: 0 4px 15px rgba(43, 88, 118, 0.2);
+      }
+
+      .airway .card-icon {
+        background: linear-gradient(135deg, #17a2b8, #138496);
+      }
+      .induction .card-icon {
+        background: linear-gradient(135deg, #2b5876, #1a365d);
+      }
+      .muscle .card-icon {
+        background: linear-gradient(135deg, #4e4376, #3a2d58);
+      }
+      .analgesic .card-icon {
+        background: linear-gradient(135deg, #28a745, #1e7e34);
+      }
+      .emergency .card-icon {
+        background: linear-gradient(135deg, #ffc107, #d39e00);
+      }
+      .sedation .card-icon {
+        background: linear-gradient(135deg, #6f42c1, #5a2d7e);
+      }
+
+      .card-title {
+        font-size: 1.2rem;
+        font-weight: 600;
+        color: var(--text-dark);
+      }
+
+      .result-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0.75rem 0;
+        border-bottom: 1px solid #ecf0f1;
+      }
+
+      .result-item:last-child {
+        border-bottom: none;
+      }
+
+      .result-label {
+        font-weight: 500;
+        color: #5d6d7e;
+      }
+
+      .result-value {
+        font-weight: 700;
+        font-size: 1.1rem;
+        color: var(--text-dark);
+        padding: 0.25rem 0.75rem;
+        background: var(--bg-light);
+        border-radius: 8px;
+        min-width: 80px;
+        text-align: center;
+      }
+
+      .result-value.calculated {
+        background: var(--primary-gradient);
+        color: var(--text-light);
+        animation: pulse 0.5s ease-in-out;
+      }
+
+      .dual-dose {
+        display: flex;
+        flex-direction: column;
+        gap: 0.25rem;
+        align-items: center;
+      }
+
+      .dose-mg {
+        font-weight: 700;
+        color: var(--text-dark);
+      }
+
+      .result-value.calculated .dose-mg {
+        color: var(--text-light);
+      }
+
+      .dose-ml {
+        font-size: 0.9rem;
+        color: var(--text-muted);
+      }
+
+      .result-value.calculated .dose-ml {
+        color: hsla(0, 0%, 100%, 0.8);
+      }
+
+      .concentration-info {
+        font-size: 0.8rem;
+        color: #95a5a6;
+        margin-top: 0.25rem;
+        cursor: pointer;
+        transition: color 0.3s ease;
+      }
+
+      .concentration-info:hover {
+        color: var(--primary-dark);
+      }
+
+      .dose-info {
+        font-size: 0.75rem;
+        color: #95a5a6;
+        margin-top: 0.25rem;
+        font-style: italic;
+      }
+
+      .modal {
+        display: none;
+        position: fixed;
+        z-index: 1000;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(43, 88, 118, 0.6);
+        backdrop-filter: blur(8px);
+        animation: fadeIn 0.3s ease-out;
+      }
+
+      .modal-content {
+        background-color: var(--white);
+        margin: 5% auto;
+        padding: 2rem;
+        border-radius: 24px;
+        width: 90%;
+        max-width: 600px;
+        max-height: 80vh;
+        overflow-y: auto;
+        animation: slideInDown 0.3s ease-out;
+        box-shadow: 0 25px 60px rgba(0, 0, 0, 0.2);
+        position: relative;
+      }
+
+      .modal-content::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 4px;
+        background: var(--primary-gradient);
+      }
+
+      .modal-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1.5rem;
+        padding-bottom: 1rem;
+        border-bottom: 2px solid #ecf0f1;
+      }
+
+      .modal-title {
+        font-size: 1.5rem;
+        font-weight: 600;
+        color: var(--text-dark);
+      }
+
+      .close {
+        color: #aaa;
+        float: right;
+        font-size: 28px;
+        font-weight: bold;
+        cursor: pointer;
+        margin-left: auto;
+      }
+
+      .close:hover {
+        color: var(--primary-dark);
+      }
+
+      .concentration-grid {
+        display: grid;
+        grid-template-columns: 2fr 1fr 1fr;
+        gap: 1rem;
+        align-items: center;
+        margin-bottom: 1rem;
+        padding: 1rem;
+        background: var(--bg-light);
+        border-radius: 8px;
+      }
+
+      .concentration-label {
+        font-weight: 500;
+        color: var(--text-dark);
+      }
+
+      .concentration-input {
+        padding: 0.5rem;
+        border: 1px solid #dee2e6;
+        border-radius: 6px;
+        text-align: center;
+      }
+
+      .concentration-unit {
+        font-size: 0.9rem;
+        color: var(--text-muted);
+      }
+
+      .empty-state {
+        text-align: center;
+        color: var(--text-muted);
+        font-style: italic;
+        padding: 2rem;
+        background: var(--bg-light);
+        border-radius: 12px;
+        margin-top: 2rem;
+      }
+
+      .error-message {
+        background: #e74c3c;
+        color: white;
+        padding: 1rem;
+        border-radius: 8px;
+        margin: 1rem 0;
+        text-align: center;
+      }
+
+      @keyframes fadeInUp {
+        from {
+          opacity: 0;
+          transform: translateY(30px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+        }
+        to {
+          opacity: 1;
+        }
+      }
+
+      @keyframes slideInDown {
+        from {
+          opacity: 0;
+          transform: translateY(-50px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      @keyframes pulse {
+        0%,
+        100% {
+          transform: scale(1);
+        }
+        50% {
+          transform: scale(1.05);
+        }
+      }
+
+      @media (max-width: 768px) {
+        .button-group {
+          flex-direction: column;
+          gap: 1rem;
+        }
+
+        .calculate-btn,
+        .settings-btn {
+          width: 100%;
+          min-width: auto;
+        }
+
+        .hero-title {
+          font-size: 2rem;
+        }
+
+        .container {
+          padding: 1rem;
+        }
+
+        .input-section {
+          padding: 1.5rem;
+        }
+
+        .input-grid {
+          grid-template-columns: 1fr;
+          gap: 1rem;
+        }
+
+        .results-grid {
+          grid-template-columns: 1fr !important;
+          gap: 1rem;
+        }
+
+        .concentration-grid {
+          grid-template-columns: 1fr;
+          gap: 0.5rem;
+          text-align: center;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <!-- The Body HTML remains the same as it correctly uses the classes defined above -->
+    <div class="hero-section">
+      <h1 class="hero-title">
+        <i class="fas fa-heartbeat"></i>
+        Pediatric Anesthesia Calculator
+      </h1>
+      <p class="hero-subtitle">
+        Calculate precise dosages for pediatric patients
+      </p>
+    </div>
+
+    <div class="container">
+      <div class="input-section">
+        <form id="calcForm">
+          <div class="input-grid">
+            <div class="input-group">
+              <i class="fas fa-birthday-cake input-icon"></i>
+              <input
+                type="number"
+                id="age"
+                class="input-field"
+                placeholder=" "
+                step="0.1"
+                min="0"
+                max="18"
+              />
+              <label class="input-label">Age (years)</label>
+            </div>
+            <div class="input-group">
+              <i class="fas fa-ruler-vertical input-icon"></i>
+              <input
+                type="number"
+                id="height"
+                class="input-field"
+                placeholder=" "
+                min="30"
+                max="200"
+              />
+              <label class="input-label">Height (cm)</label>
+            </div>
+            <div class="input-group">
+              <i class="fas fa-weight input-icon"></i>
+              <input
+                type="number"
+                id="weight"
+                class="input-field"
+                placeholder=" "
+                step="0.1"
+                min="1"
+                max="120"
+              />
+              <label class="input-label">Weight (kg)</label>
+            </div>
+          </div>
+          <div class="button-group">
+            <button type="submit" class="calculate-btn">
+              <i class="fas fa-calculator"></i> Calculate Dosages
+            </button>
+            <button type="button" class="settings-btn" onclick="openSettings()">
+              <i class="fas fa-cog"></i> Concentrations
+            </button>
+          </div>
+        </form>
+      </div>
+
+      <div id="error-container"></div>
+
+      <div class="results-grid" id="resultsGrid">
+        <!-- Airway Management -->
+        <div class="result-card airway">
+          <div class="card-header">
+            <div class="card-icon">
+              <i class="fas fa-lungs"></i>
+            </div>
+            <h3 class="card-title">Airway Management</h3>
+          </div>
+          <div class="result-item">
+            <span class="result-label">ETT ID</span>
+            <span class="result-value" id="ett_id">-</span>
+          </div>
+          <div class="result-item">
+            <span class="result-label">ETT Depth</span>
+            <span class="result-value" id="ett_depth">-</span>
+          </div>
+          <div class="result-item">
+            <span class="result-label">C Line</span>
+            <span class="result-value" id="c_line">-</span>
+          </div>
+        </div>
+
+        <!-- Induction Agents -->
+        <div class="result-card induction">
+          <div class="card-header">
+            <div class="card-icon">
+              <i class="fas fa-syringe"></i>
+            </div>
+            <h3 class="card-title">Induction Agents</h3>
+          </div>
+          <div class="result-item">
+            <span class="result-label">Propofol</span>
+            <div class="result-value dual-dose" id="propofol">
+              <span class="dose-mg">-</span>
+              <span class="dose-ml">-</span>
+            </div>
+          </div>
+          <div class="result-item">
+            <span class="result-label">TPT</span>
+            <div class="result-value dual-dose" id="tpt">
+              <span class="dose-mg">-</span>
+              <span class="dose-ml">-</span>
+            </div>
+          </div>
+          <div class="result-item">
+            <span class="result-label">Ketamine</span>
+            <div class="result-value dual-dose" id="ketamine">
+              <span class="dose-mg">-</span>
+              <span class="dose-ml">-</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Muscle Relaxants -->
+        <div class="result-card muscle">
+          <div class="card-header">
+            <div class="card-icon">
+              <i class="fas fa-capsules"></i>
+            </div>
+            <h3 class="card-title">Muscle Relaxants</h3>
+          </div>
+          <div class="result-item">
+            <span class="result-label">ROC</span>
+            <div class="result-value dual-dose" id="roc">
+              <span class="dose-mg">-</span>
+              <span class="dose-ml">-</span>
+            </div>
+          </div>
+          <div class="result-item">
+            <span class="result-label">Vecuronium</span>
+            <div class="result-value dual-dose" id="vecuronium">
+              <span class="dose-mg">-</span>
+              <span class="dose-ml">-</span>
+            </div>
+          </div>
+          <div class="result-item">
+            <span class="result-label">Succinylcholine</span>
+            <div class="result-value dual-dose" id="succinylcholine">
+              <span class="dose-mg">-</span>
+              <span class="dose-ml">-</span>
+            </div>
+          </div>
+          <div class="result-item">
+            <span class="result-label">Sugammadex</span>
+            <div class="result-value dual-dose" id="sugammadex">
+              <span class="dose-mg">-</span>
+              <span class="dose-ml">-</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Analgesics -->
+        <div class="result-card analgesic">
+          <div class="card-header">
+            <div class="card-icon">
+              <i class="fas fa-band-aid"></i>
+            </div>
+            <h3 class="card-title">Analgesics</h3>
+          </div>
+          <div class="result-item">
+            <span class="result-label">Fentanyl</span>
+            <div class="result-value dual-dose" id="fentanyl">
+              <span class="dose-mg">-</span>
+              <span class="dose-ml">-</span>
+            </div>
+          </div>
+          <div class="result-item">
+            <span class="result-label">Remifentanil</span>
+            <div class="result-value dual-dose" id="remifentanil">
+              <span class="dose-mg">-</span>
+              <span class="dose-ml">-</span>
+            </div>
+          </div>
+          <div class="result-item">
+            <span class="result-label">Sufentanil</span>
+            <div class="result-value dual-dose" id="sufentanil">
+              <span class="dose-mg">-</span>
+              <span class="dose-ml">-</span>
+            </div>
+          </div>
+          <div class="result-item">
+            <span class="result-label">Nalbuphine</span>
+            <div class="result-value dual-dose" id="nalbuphine">
+              <span class="dose-mg">-</span>
+              <span class="dose-ml">-</span>
+            </div>
+          </div>
+          <div class="result-item">
+            <span class="result-label">Morphine</span>
+            <div class="result-value dual-dose" id="morphine">
+              <span class="dose-mg">-</span>
+              <span class="dose-ml">-</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Sedation -->
+        <div class="result-card sedation">
+          <div class="card-header">
+            <div class="card-icon">
+              <i class="fas fa-moon"></i>
+            </div>
+            <h3 class="card-title">Sedation</h3>
+          </div>
+          <div class="result-item">
+            <span class="result-label">Midazolam</span>
+            <div class="result-value dual-dose" id="midazolam">
+              <span class="dose-mg">-</span>
+              <span class="dose-ml">-</span>
+            </div>
+          </div>
+          <div class="result-item">
+            <span class="result-label">Dexmedetomidine</span>
+            <div class="result-value dual-dose" id="dexmedetomidine">
+              <span class="dose-mg">-</span>
+              <span class="dose-ml">-</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Emergency & Adjuvants -->
+        <div class="result-card emergency">
+          <div class="card-header">
+            <div class="card-icon">
+              <i class="fas fa-exclamation-triangle"></i>
+            </div>
+            <h3 class="card-title">Emergency & Adjuvants</h3>
+          </div>
+          <div class="result-item">
+            <span class="result-label">Atropine</span>
+            <div class="result-value dual-dose" id="atropine">
+              <span class="dose-mg">-</span>
+              <span class="dose-ml">-</span>
+            </div>
+          </div>
+          <div class="result-item">
+            <span class="result-label">Lidocaine</span>
+            <div class="result-value dual-dose" id="lidocaine">
+              <span class="dose-mg">-</span>
+              <span class="dose-ml">-</span>
+            </div>
+          </div>
+          <div class="result-item">
+            <span class="result-label">Epinephrine</span>
+            <div class="result-value dual-dose" id="epinephrine">
+              <span class="dose-mg">-</span>
+              <span class="dose-ml">-</span>
+            </div>
+          </div>
+          <div class="result-item">
+            <span class="result-label">Denogan</span>
+            <div class="result-value dual-dose" id="denogan">
+              <span class="dose-mg">-</span>
+              <span class="dose-ml">-</span>
+            </div>
+          </div>
+          <div class="result-item">
+            <span class="result-label">Ondansetron</span>
+            <div class="result-value dual-dose" id="ondansetron">
+              <span class="dose-mg">-</span>
+              <span class="dose-ml">-</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="empty-state" id="emptyState">
+        <i
+          class="fas fa-info-circle"
+          style="font-size: 2rem; margin-bottom: 1rem; color: #bdc3c7"
+        ></i>
+        <p>Enter patient information above to calculate dosages</p>
+      </div>
+    </div>
+
+    <!-- Settings Modal -->
+    <div id="settingsModal" class="modal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h2 class="modal-title">Drug Concentrations Settings</h2>
+          <span class="close" onclick="closeSettings()">&times;</span>
+        </div>
+        <div id="concentrationSettings">
+          <!-- Concentrations will be populated by JavaScript -->
+        </div>
+        <div style="text-align: center; margin-top: 2rem">
+          <button class="calculate-btn" onclick="saveSettings()">
+            <i class="fas fa-save"></i> Save & Recalculate
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      // The JavaScript logic remains the same.
+      // Default concentrations (mg/ml or mcg/ml)
+      let concentrations = {
+        atropine: { value: 0.5, unit: "mg/ml" },
+        lidocaine: { value: 10, unit: "mg/ml" },
+        propofol: { value: 10, unit: "mg/ml" },
+        tpt: { value: 25, unit: "mg/ml" },
+        roc: { value: 10, unit: "mg/ml" },
+        fentanyl: { value: 50, unit: "mcg/ml" },
+        denogan: { value: 200, unit: "mg/ml" },
+        ondansetron: { value: 2, unit: "mg/ml" },
+        ketamine: { value: 50, unit: "mg/ml" },
+        midazolam: { value: 5, unit: "mg/ml" },
+        dexmedetomidine: { value: 100, unit: "mcg/ml" },
+        succinylcholine: { value: 20, unit: "mg/ml" },
+        morphine: { value: 1, unit: "mg/ml" },
+        epinephrine: { value: 1000, unit: "mcg/ml" },
+        remifentanil: { value: 50, unit: "mcg/ml" },
+        sufentanil: { value: 5, unit: "mcg/ml" },
+        nalbuphine: { value: 10, unit: "mg/ml" },
+        vecuronium: { value: 4, unit: "mg/ml" },
+        sugammadex: { value: 100, unit: "mg/ml" },
+      };
+
+      // Dosage formulas (dose per kg)
+      const dosageFormulas = {
+        atropine: 0.02,
+        lidocaine: 0.5,
+        propofol: 2,
+        tpt: 6,
+        roc: 0.6,
+        fentanyl: 1, // mcg/kg
+        denogan: 15,
+        ondansetron: 0.1,
+        ketamine: 2,
+        midazolam: 0.1,
+        dexmedetomidine: 1, // mcg/kg
+        succinylcholine: 1.5,
+        morphine: 0.1,
+        epinephrine: 10, // mcg/kg
+        remifentanil: 0.5, // mcg/kg
+        sufentanil: 0.3, // mcg/kg
+        nalbuphine: 0.2, // mg/kg
+        vecuronium: 0.1, // mg/kg
+        sugammadex: 2, // mg/kg (reversal dose)
+      };
+
+      const form = document.getElementById("calcForm");
+      const ageInput = document.getElementById("age");
+      const heightInput = document.getElementById("height");
+      const weightInput = document.getElementById("weight");
+      const resultsGrid = document.getElementById("resultsGrid");
+      const emptyState = document.getElementById("emptyState");
+      const errorContainer = document.getElementById("error-container");
+
+      function showError(message) {
+        errorContainer.innerHTML = `<div class="error-message">${message}</div>`;
+        setTimeout(() => {
+          errorContainer.innerHTML = "";
+        }, 5000);
+      }
+
+      function updateResultValue(elementId, value, unit = "") {
+        const element = document.getElementById(elementId);
+        if (element && element.classList.contains("dual-dose")) {
+          const mgSpan = element.querySelector(".dose-mg");
+          const mlSpan = element.querySelector(".dose-ml");
+          mgSpan.textContent = value.mg;
+          mlSpan.textContent = value.ml;
+        } else if (element) {
+          element.textContent = value + (unit ? " " + unit : "");
+        }
+        if (element) element.classList.add("calculated");
+      }
+
+      function calculateDosages() {
+        const age = parseFloat(ageInput.value);
+        const height = parseFloat(heightInput.value);
+        const weight = parseFloat(weightInput.value);
+
+        errorContainer.innerHTML = "";
+
+        if (!age || !height || !weight) {
+          emptyState.style.display = "block";
+          resultsGrid.style.display = "none";
+          return;
+        }
+
+        if (age < 0 || age > 18) {
+          showError("Age must be between 0 and 18 years");
+          return;
+        }
+
+        if (height < 30 || height > 200) {
+          showError("Height must be between 30 and 200 cm");
+          return;
+        }
+
+        if (weight < 1 || weight > 120) {
+          showError("Weight must be between 1 and 120 kg");
+          return;
+        }
+
+        try {
+          emptyState.style.display = "none";
+          resultsGrid.style.display = "grid";
+
+          // Calculate airway management
+          const ettId = Math.round((age / 4 + 3.5) * 10) / 10;
+          const ettDepth = Math.round((age / 2 + 12) * 10) / 10;
+          const cLine =
+            Math.round((height / 10 - (height < 100 ? 1.5 : 2)) * 10) / 10;
+
+          updateResultValue("ett_id", ettId, "mm");
+          updateResultValue("ett_depth", ettDepth, "cm");
+          updateResultValue("c_line", cLine, "cm");
+
+          // Calculate medications
+          Object.keys(dosageFormulas).forEach((drugId) => {
+            const dosePerKg = dosageFormulas[drugId];
+            const concentration = concentrations[drugId];
+
+            if (concentration) {
+              const totalDose = weight * dosePerKg;
+              const volume = totalDose / concentration.value;
+
+              const doseValue = Math.round(totalDose * 100) / 100;
+              const volumeValue = Math.round(volume * 100) / 100;
+
+              const unit = concentration.unit.includes("mcg") ? "mcg" : "mg";
+
+              updateResultValue(drugId, {
+                mg: `${doseValue} ${unit}`,
+                ml: `${volumeValue} ml`,
+              });
+
+              // Add dose per kg info
+              const element = document.getElementById(drugId);
+              if (element) {
+                // Remove existing dose info
+                const existingInfo = element.querySelector(".dose-info");
+                if (existingInfo) {
+                  existingInfo.remove();
+                }
+
+                // Add new dose info
+                const doseInfo = document.createElement("div");
+                doseInfo.className = "dose-info";
+                doseInfo.textContent = `(${dosePerKg} ${unit}/kg)`;
+                element.appendChild(doseInfo);
+              }
+            }
+          });
+        } catch (error) {
+          showError("Calculation error. Please check your inputs.");
+        }
+      }
+
+      function openSettings() {
+        const modal = document.getElementById("settingsModal");
+        const settingsContainer = document.getElementById(
+          "concentrationSettings"
+        );
+
+        // Generate concentration settings
+        let html = "";
+        Object.keys(concentrations).forEach((drug) => {
+          const conc = concentrations[drug];
+          const drugName = drug.charAt(0).toUpperCase() + drug.slice(1);
+
+          html += `
+                    <div class="concentration-grid">
+                        <span class="concentration-label">${drugName}</span>
+                        <input type="number" class="concentration-input" 
+                               data-drug="${drug}" 
+                               value="${conc.value}" 
+                               step="0.1" min="0.1">
+                        <span class="concentration-unit">${conc.unit}</span>
+                    </div>
+                `;
+        });
+
+        settingsContainer.innerHTML = html;
+        modal.style.display = "block";
+      }
+
+      function closeSettings() {
+        document.getElementById("settingsModal").style.display = "none";
+      }
+
+      function saveSettings() {
+        const inputs = document.querySelectorAll(".concentration-input");
+        inputs.forEach((input) => {
+          const drug = input.dataset.drug;
+          const value = parseFloat(input.value);
+          if (value > 0) {
+            concentrations[drug].value = value;
+          }
+        });
+
+        // Update concentration display in the main interface
+        updateConcentrationDisplay();
+
+        closeSettings();
+        calculateDosages(); // Recalculate with new concentrations
+      }
+
+      function updateConcentrationDisplay() {
+        // Remove existing concentration info
+        document
+          .querySelectorAll(".concentration-info")
+          .forEach((el) => el.remove());
+
+        // Add updated concentration info
+        document.querySelectorAll(".result-card").forEach((card) => {
+          const medications = card.querySelectorAll(".result-item");
+          medications.forEach((item) => {
+            const label = item.querySelector(".result-label");
+            if (label) {
+              const drugName = label.textContent
+                .toLowerCase()
+                .replace(/\s+/g, "");
+              if (concentrations[drugName]) {
+                const conc = concentrations[drugName];
+                const info = document.createElement("div");
+                info.className = "concentration-info";
+                info.textContent = `(${conc.value} ${conc.unit})`;
+                info.title = "Click settings to modify concentration";
+                label.appendChild(info);
+              }
+            }
+          });
+        });
+      }
+
+      // Real-time calculation
+      function setupRealTimeCalculation() {
+        [ageInput, heightInput, weightInput].forEach((input) => {
+          input.addEventListener("input", calculateDosages);
+        });
+      }
+
+      form.addEventListener("submit", function (e) {
+        e.preventDefault();
+        calculateDosages();
+      });
+
+      // Close modal when clicking outside
+      window.addEventListener("click", function (event) {
+        const modal = document.getElementById("settingsModal");
+        if (event.target === modal) {
+          closeSettings();
+        }
+      });
+
+      // Initialize
+      setupRealTimeCalculation();
+      calculateDosages();
+
+      // Add concentration info display
+      function addConcentrationInfo() {
+        updateConcentrationDisplay();
+      }
+
+      // Initialize concentration info
+      setTimeout(addConcentrationInfo, 100);
+    </script>
+  </body>
+</html>
