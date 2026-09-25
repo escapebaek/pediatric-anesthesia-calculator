@@ -408,6 +408,28 @@
         color: var(--text-dark);
       }
 
+      .mix-box summary {
+        cursor: pointer;
+        list-style: none;
+      }
+
+      .mix-box summary::-webkit-details-marker {
+        display: none;
+      }
+
+      .mix-box summary::before {
+        content: "▸ ";
+        color: #b7791f;
+      }
+
+      .mix-box[open] summary::before {
+        content: "▾ ";
+      }
+
+      .mix-box[open] summary {
+        margin-bottom: 0.15rem;
+      }
+
       .mix-box .mix-h {
         font-weight: 700;
         color: #b7791f;
@@ -1044,12 +1066,9 @@
         {
           id: "denogan", name: "Denogan (Propacetamol)", icon: "fa-pills", cat: "analgesic",
           cu: "mg", conc: 200,
-          doses: [
-            { l: "15 mg/kg (=APAP 7.5)", d: 15, max: 2000 },
-            { l: "30 mg/kg (=APAP 15)", d: 30, max: 2000 }
-          ],
-          info: "Propacetamol 2 mg = Acetaminophen 1 mg · 1일 최대 120 mg/kg",
-          caution: "소아 통상 용량 <b>30 mg/kg</b> (acetaminophen 15 mg/kg 해당), 6시간 간격. 15 mg/kg 는 acetaminophen 7.5 mg/kg 에 해당 — 10kg 이하 영아 용량. Profa 등 acetaminophen 제제와 <b>중복 금지</b>.",
+          doses: [{ l: "30 mg/kg (=APAP 15)", d: 30, max: 2000 }],
+          info: "30 mg/kg (= Acetaminophen 15 mg/kg) · 6시간 간격 · 1일 최대 120 mg/kg",
+          caution: "Propacetamol 2 mg = Acetaminophen 1 mg. Profa 등 acetaminophen 제제와 <b>중복 금지</b>.",
           mix: { amt: 1000, unit: "mg", vol: 0, n: 1, cu: "mg", label: "1g 분말", dil: "전용 용해액",
             std: "1ⓥ(1g) + 전용 용해액 5ml = 200mg/ml → NS 또는 D5W 에 희석해 15분 주입" }
         },
@@ -1161,6 +1180,11 @@
               </div>`;
       }
 
+      // MIX 는 접힌 상태로 시작 — 필요할 때 펼쳐 봅니다
+      function mixBoxHtml(inputId, m) {
+        return `<details class="mix-box"><summary><span class="mix-h">MIX${m.title ? " · " + m.title : ""}</span>조제 방법</summary><div id="${inputId}_mix"></div></details>`;
+      }
+
       function cardHtml(drug) {
         let body = concInputHtml(drug.id + "_conc", drug.conc, drug.cu);
         const results = drug.doses
@@ -1179,7 +1203,7 @@
                 <input type="number" id="${drug.id}_inf_rate" value="${inf.def}" step="${inf.step}" min="0" />
               </div>
             </div>
-            ${inf.mix ? `<div class="mix-box" id="${drug.id}_inf_conc_mix"></div>` : ""}`;
+            ${inf.mix ? mixBoxHtml(drug.id + "_inf_conc", inf.mix) : ""}`;
         }
 
         return `
@@ -1190,7 +1214,7 @@
             </div>
             <div class="calculator-card-body">${body}
             </div>
-            <div class="mix-box" id="${drug.id}_conc_mix"></div>
+            ${mixBoxHtml(drug.id + "_conc", drug.mix)}
             ${infHtml}
             <p class="info-text">${drug.info}</p>
             <div class="age-flag" id="${drug.id}_age_flag"></div>
@@ -1227,10 +1251,9 @@
         String(x >= 20 ? Math.round(x * 10) / 10 : Math.round(x * 100) / 100);
 
       function mixText(m, conc) {
-        const head = '<span class="mix-h">MIX' + (m.title ? " · " + m.title : "") + "</span>";
         const std = '<span class="mix-sub">표준: ' + m.std + (m.note ? " · " + m.note : "") + "</span>";
-        if (!(conc > 0)) return head + "농도를 입력하세요" + std;
-        if (m.neat) return head + "<b>원액 사용</b>" + std;
+        if (!(conc > 0)) return "농도를 입력하세요" + std;
+        if (m.neat) return "<b>원액 사용</b>" + std;
 
         const amtTotal = convUnit(m.amt * m.n, m.unit, m.cu);
         const total = amtTotal / conc;
@@ -1256,7 +1279,7 @@
               fmt(m.syr - draw) + "ml</span>";
           }
         }
-        return head + line + syr + std;
+        return line + syr + std;
       }
 
       function updateMixes() {
